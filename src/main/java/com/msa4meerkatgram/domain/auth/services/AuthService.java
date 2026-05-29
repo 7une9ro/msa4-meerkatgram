@@ -6,13 +6,17 @@ import com.msa4meerkatgram.domain.auth.responses.AuthResponse;
 import com.msa4meerkatgram.domain.user.entities.User;
 import com.msa4meerkatgram.domain.user.mapper.UserMapper;
 import com.msa4meerkatgram.domain.user.responses.UserResponse;
+import com.msa4meerkatgram.global.errors.custom.InvalidTokenException;
 import com.msa4meerkatgram.global.errors.custom.NotRegisteredException;
 import com.msa4meerkatgram.global.security.cookie.CookieManager;
 import com.msa4meerkatgram.global.security.jwt.JwtConfig;
 import com.msa4meerkatgram.global.security.jwt.JwtProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +40,48 @@ public class AuthService {
 
         // 비밀번호 체크
 
+        return this.generateAuthentication(response, user);
+    }
 
+    /**
+     * refresh 토큰 재발급
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @return AuthResponse
+     */
+    public AuthResponse reissue(HttpServletRequest request, HttpServletResponse response) {
+        // HttpServletRequest 객체로부터 refreshToken 획득(추출)
+        Optional<String> extractedRefreshToken = jwtProvider.extractRefreshToken(request);
+
+        // 쿠키 존재 유무 검증
+        if (extractedRefreshToken.isEmpty())
+            throw new InvalidTokenException("토큰이 존재하지 않습니다.");
+
+        String refreshToken = extractedRefreshToken.get();
+
+        long subjectId = Long.parseLong(jwtProvider.extractClaims(refreshToken).getSubject());
+
+        // 유저 획득
+        User user = userMapper.findById(subjectId);
+
+        // 유저 가입 여부 확인
+        if (user == null)
+            throw new InvalidTokenException("유효하지 않은 회원의 토큰입니다.");
+
+        // DB에 저장되어 있는 refreshToken과 요청 쿠키에 저장되어 있는 refreshToken과 비교
+        if (!user.getRefreshToken().equals(refreshToken))
+            throw new InvalidTokenException("토큰이 일치하지 않습니다.");
+
+        return this.generateAuthentication(response, user);
+    }
+
+    /**
+     * Access & Refresh 토큰 생성 및 Refresh 토큰 -> DB & 쿠키에 저장
+     * @param response HttpServletResponse
+     * @param user User
+     * @return AuthResponse
+     */
+    private AuthResponse generateAuthentication(HttpServletResponse response, User user) {
         // 토큰 생성
         String newAccessToken = jwtProvider.generateAccessToken(user);
         String newRefreshToken = jwtProvider.generateRefreshToken(user);

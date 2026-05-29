@@ -16,7 +16,13 @@ public class CookieManager {
 
     private final JwtConfig jwtConfig;
 
-    // Request Header에서 특정 쿠키를 획득하는 메서드 (Optional 반환)
+    /**
+     * Request Header에서 특정 쿠키를 획득하는 메서드 (Optional 반환)
+     * @param request 요청
+     * @param name 찾고자하는 쿠키명
+     * @return Optional<Cookie>
+     * @throws Exception
+     */
     public Optional<Cookie> getCookie(HttpServletRequest request, String name) {
 
         // 쿠키 존재 여부 확인
