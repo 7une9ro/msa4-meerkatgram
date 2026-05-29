@@ -1,7 +1,9 @@
 package com.msa4meerkatgram.domain.auth.controllers;
 
 import com.msa4meerkatgram.domain.auth.requests.LoginRequest;
+import com.msa4meerkatgram.domain.auth.responses.AuthResponse;
 import com.msa4meerkatgram.domain.auth.services.AuthService;
+import com.msa4meerkatgram.global.responses.BaseResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +22,17 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(
+    public ResponseEntity<BaseResponse<AuthResponse>> login(
             @Valid @RequestBody LoginRequest loginRequest
             , HttpServletResponse response
     ) {
-        authService.login(loginRequest);
 
-        return ResponseEntity.status(200).body("test"
+        return ResponseEntity.status(200).body(
+                BaseResponse.<AuthResponse>builder()
+                        .code("00")
+                        .message("정상 처리")
+                        .data(authService.login(loginRequest, response))
+                        .build()
         );
     }
 }
