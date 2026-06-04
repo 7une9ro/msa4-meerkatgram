@@ -4,6 +4,7 @@ import com.msa4meerkatgram.domain.post.entities.Post;
 import com.msa4meerkatgram.domain.post.mapper.PostMapper;
 import com.msa4meerkatgram.domain.post.requests.PostIndexRequest;
 import com.msa4meerkatgram.domain.post.responses.PostIndexResponse;
+import com.msa4meerkatgram.global.errors.custom.NotExistPostException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +33,15 @@ public class PostService {
                 .lastPage(lastPage)
                 .posts(posts)
                 .build();
+    }
+
+    public Post detail(Long id) {
+
+        Post post = postMapper.findById(id);
+
+        if (post == null)
+            throw new NotExistPostException("존재하지 않는 게시글입니다.");
+
+        return post;
     }
 }

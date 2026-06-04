@@ -60,6 +60,21 @@ public class JwtProvider {
                 .map(Cookie::getValue);
     }
 
+    /**
+     * 헤더에서 BearerToken(Access 토큰) 추출
+     * @param request 요청 객체
+     * @return Optional - AccessToken
+     */
+    public Optional<String> extractAccessToken(HttpServletRequest request) {
+
+        String bearerToken = request.getHeader(jwtConfig.headerKey());
+
+        if (bearerToken == null || !bearerToken.startsWith(jwtConfig.scheme()))
+            return Optional.empty();
+
+        return Optional.of(bearerToken.substring(jwtConfig.scheme().length()).trim());
+    }
+
     // 토큰 검증 및 Claim(Payload) 추출
     public Claims extractClaims(String token) {
         try {

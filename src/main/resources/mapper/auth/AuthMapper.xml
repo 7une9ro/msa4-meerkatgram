@@ -14,4 +14,26 @@
     WHERE
         id = #{id}
   </update>
+
+  <insert id="create"
+          useGeneratedKeys="true"
+          keyProperty="id"
+  >
+    INSERT INTO users(
+        email
+        , password
+        , nick
+        , provider
+        , profile
+        , role
+    )
+    VALUES (
+       #{email}
+        , #{password}
+        , #{nick}
+        , #{provider}
+        , #{profile}
+        , #{role}
+    )
+  </insert>
 </mapper>

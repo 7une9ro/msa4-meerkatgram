@@ -12,4 +12,6 @@ public interface PostMapper {
     List<Post> getPagination(@Param("limit") int limit, @Param("offset") int offset);
 
     long getTotalPosts();
+
+    Post findById(Long id);
 }

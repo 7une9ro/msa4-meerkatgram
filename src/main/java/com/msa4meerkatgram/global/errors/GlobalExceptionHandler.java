@@ -1,17 +1,20 @@
 package com.msa4meerkatgram.global.errors;
 
-import com.msa4meerkatgram.global.errors.custom.InvalidTokenException;
-import com.msa4meerkatgram.global.errors.custom.NotRegisteredException;
+import com.msa4meerkatgram.global.errors.custom.*;
 import com.msa4meerkatgram.global.responses.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -19,7 +22,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotRegisteredException.class)
     public ResponseEntity<BaseResponse<String>> notRegisteredHandle(NotRegisteredException e) {
-        return ResponseEntity.status(400).body(
+        return ResponseEntity.status(401).body(
                 BaseResponse.<String>builder()
                         .code("E01")
                         .message("로그인 에러")
@@ -28,12 +31,56 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<BaseResponse<String>> authenticationHandle(AuthenticationException e) {
+        return ResponseEntity.status(401).body(
+                BaseResponse.<String>builder()
+                        .code("E02")
+                        .message("UNAUTHENTICATED_ERROR")
+                        .data("로그인 후 이용해 주세요.")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<BaseResponse<String>> accessDeniedHandle(AccessDeniedException e) {
+        return ResponseEntity.status(403).body(
+                BaseResponse.<String>builder()
+                        .code("E03")
+                        .message("UNAUTHORIZED_ERROR")
+                        .data("로그인 후 이용해 주세요.")
+                        .build()
+        );
+    }
+
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<BaseResponse<String>> invalidTokenHandle(InvalidTokenException e) {
-        return ResponseEntity.status(400).body(
+        return ResponseEntity.status(401).body(
                 BaseResponse.<String>builder()
                         .code("E04")
                         .message("토큰 에러")
+                        .data(e.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(NotExistPostException.class)
+    public ResponseEntity<BaseResponse<String>> notExistPostHandle(NotExistPostException e) {
+        return ResponseEntity.status(404).body(
+                BaseResponse.<String>builder()
+                        .code("E10")
+                        .message("NOT_EXIST_POST_ERROR")
+                        .data(e.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(DuplicatedRecordException.class)
+    public ResponseEntity<BaseResponse<String>> duplicatedRecordHandle(DuplicatedRecordException e) {
+        return ResponseEntity.status(409).body(
+                BaseResponse.<String>builder()
+                        .code("E11")
+                        .message("DUPLICATED_RECORD_ERROR")
                         .data(e.getMessage())
                         .build()
         );
@@ -51,18 +98,34 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<BaseResponse<List<String>>> methodArgumentNotValidHandle(MethodArgumentNotValidException e) {
+    public ResponseEntity<BaseResponse<Map<String, String>>> methodArgumentNotValidHandle(MethodArgumentNotValidException e) {
+        Map<String, String> errors = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField, // 필드명
+                        fieldError -> fieldError.getDefaultMessage() != null ? fieldError.getDefaultMessage() : "유효하지 않은 값입니다.",
+                        (existing, replacement) -> existing // 중복 필드가 있을 경우 기존 값 유지
+                ));
+
         return ResponseEntity.status(400).body(
-                BaseResponse.<List<String>>builder()
+                BaseResponse.<Map<String, String>>builder()
                         .code("E21")
                         .message("요청 파라미터에 이상이 있습니다.")
-                        .data(
-                                e.getBindingResult()
-                                    .getAllErrors()
-                                    .stream()
-                                    .map(item -> String.format("%s : 잘못된 값입니다.", item.getObjectName()))
-                                    .toList()
-                        )
+                        .data(errors)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(FileManagedException.class)
+    public ResponseEntity<BaseResponse<String>> fileManagedHandle(FileManagedException e) {
+        log.error("파일 업로드 에러: {}\n{}" , e.getMessage(), Arrays.toString(e.getStackTrace()));
+
+        return ResponseEntity.status(500).body(
+                BaseResponse.<String>builder()
+                        .code("E40")
+                        .message("파일 업로드 실패")
+                        .data(e.getMessage())
                         .build()
         );
     }
