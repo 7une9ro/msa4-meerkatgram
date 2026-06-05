@@ -14,4 +14,6 @@ public interface PostMapper {
     long getTotalPosts();
 
     Post findById(Long id);
+
+    long countPostsByUserId(Long id);
 }
