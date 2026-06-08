@@ -43,3 +43,8 @@ CLAUDE.md
 README.md
 .antigravitycli
 storage
+
+*.md
+build.gradle
+*.toml
+*.log
