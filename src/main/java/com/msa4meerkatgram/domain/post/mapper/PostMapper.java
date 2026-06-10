@@ -16,4 +16,8 @@ public interface PostMapper {
     Post findById(Long id);
 
     long countPostsByUserId(Long id);
+
+    int create(Post post);
+
+    int delete(Long id);
 }
