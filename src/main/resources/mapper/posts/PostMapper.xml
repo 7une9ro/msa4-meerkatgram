@@ -57,4 +57,29 @@
         and
             user_id = #{userId}
     </select>
+
+    <insert id="create"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            parameterType="Post">--  parameterType 무조건 기재해야 함?
+        INSERT INTO posts(
+            user_id
+             , content
+             , image
+        )
+        VALUES (
+            #{userId}
+           , #{content}
+           , #{image}
+        )
+    </insert>
+
+    <update id="delete">
+        update
+            posts
+        set
+            deleted_at = now()
+        where
+            id = #{id}
+    </update>
 </mapper>
