@@ -7,12 +7,9 @@ import com.msa4meerkatgram.domain.auth.responses.AuthResponse;
 import com.msa4meerkatgram.domain.post.mapper.PostMapper;
 import com.msa4meerkatgram.domain.user.entities.User;
 import com.msa4meerkatgram.domain.user.mapper.UserMapper;
-import com.msa4meerkatgram.domain.user.responses.UserResponse;
 import com.msa4meerkatgram.global.errors.custom.DuplicatedRecordException;
 import com.msa4meerkatgram.global.errors.custom.InvalidTokenException;
 import com.msa4meerkatgram.global.errors.custom.NotRegisteredException;
-import com.msa4meerkatgram.global.security.constant.ProviderPolicy;
-import com.msa4meerkatgram.global.security.constant.RolePolicy;
 import com.msa4meerkatgram.global.security.cookie.CookieManager;
 import com.msa4meerkatgram.global.security.jwt.JwtConfig;
 import com.msa4meerkatgram.global.security.jwt.JwtProvider;
@@ -115,17 +112,17 @@ public class AuthService {
         // 리턴
         return AuthResponse.builder()
                 .accessToken(newAccessToken)
-                .user(
-                        UserResponse.builder()
-                                .id(user.getId())
-                                .email(user.getEmail())
-                                .nick(user.getNick())
-                                .role(user.getRole())
-                                .profile(user.getProfile())
-                                .createdAt(user.getCreatedAt())
-                                .countPosts(countPosts)
-                                .build()
-                )
+                // .user(
+                //         UserResponse.builder()
+                //                 .id(user.getId())
+                //                 .email(user.getEmail())
+                //                 .nick(user.getNick())
+                //                 .role(user.getRole())
+                //                 .profile(user.getProfile())
+                //                 .createdAt(user.getCreatedAt())
+                //                 .countPosts(countPosts)
+                //                 .build()
+                // )
                 .build();
     }
 
@@ -160,15 +157,15 @@ public class AuthService {
             throw new DuplicatedRecordException("이미 가입된 회원입니다.");
         }
 
-        User newUser = User.builder()
-                .email(registrationRequest.email())
-                .password(passwordEncoder.encode(registrationRequest.password()))
-                .nick(registrationRequest.nick())
-                .provider(ProviderPolicy.NONE.getProvider())
-                .role(RolePolicy.NORMAL.getRole())
-                .profile(registrationRequest.profile())
-                .build();
+        // User newUser = User.builder()
+        //         .email(registrationRequest.email())
+        //         .password(passwordEncoder.encode(registrationRequest.password()))
+        //         .nick(registrationRequest.nick())
+        //         .provider(ProviderPolicy.NONE.getProvider())
+        //         .role(RolePolicy.NORMAL.getRole())
+        //         .profile(registrationRequest.profile())
+        //         .build();
 
-        authMapper.create(newUser);
+        // authMapper.create(newUser);
     }
 }
