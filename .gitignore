@@ -45,6 +45,5 @@ README.md
 storage
 
 *.md
-build.gradle
 *.toml
 *.log
