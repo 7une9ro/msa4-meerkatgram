@@ -1,11 +1,14 @@
 spring:
   application:
     name: msa4-meerkatgram
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:meerkatgram}?characterEncoding=UTF-8&serverTimezone=UTC
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
     # 커넥션 풀 설정
     hikari:
       maximum-pool-size: 10
@@ -20,6 +23,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        default_batch_fetch_size: 100
     defer-datasource-initialization: true
   sql:
     init:
@@ -34,10 +38,20 @@ spring:
     ansi:
       enabled: ALWAYS
 
-# Mybatis 설정
-mybatis:
-  mapper-locations: classpath:mapper/**/*Mapper.xml
-  type-aliases-package: com.msa4meerkatgram
+# Springdoc Open api 환경 설정
+springdoc:
+  # 클라이언트가 서버로 데이터를 보낼 때의 기본 형식을 지정하는 속성
+  default-consumes-media-type: application/json
+  # 서버가 클라이언트로 데이터를 보낼 때의 기본 형식을 지정하는 속성
+  default-produces-media-type: application/json
+  swagger-ui:
+    # Swagger UI 접속 경로 설정
+    path: /swagger-ui.html
+    # API 정렬 기준
+    operations-sorter: alpha
+  api-docs:
+    # OpenAPI 스펙을 JSON 파일로 확인할 수 있는 경로
+    path: /api-docs
 
 # Security & JWT
 security:
@@ -49,7 +63,7 @@ security:
     refresh-token-expiry: ${JWT_REFRESH_TOKEN_EXPIRY:1296000000}
     refresh-token-cookie-name: refresh-token
     refresh-token-cookie-expiry: ${JWT_REFRESH_TOKEN_COOKIE_EXPIRY:1296000}
-    secret: ${JWT_SECRET}
+    secret: ${JWT_SECRET:w4e5gwe57nhwb456g3h46g34of6h9439f5h8o7os5789hflsg645eh74s57he54g734}
     header-key: Authorization
     scheme: Bearer
     reiss-uri: /api/reissue-token

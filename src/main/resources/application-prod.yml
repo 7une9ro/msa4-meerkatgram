@@ -14,10 +14,6 @@ spring:
     ansi:
       enabled: ALWAYS
 
-# Mybatis 설정
-mybatis:
-  mapper-locations: classpath:mapper/**/*Mapper.xml
-  type-aliases-package: com.msa4meerkatgram
 
 # Security & JWT
 security:
