@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "posts")
-@SQLDelete(sql = "UPDATE users SET deleted_at = NOW() where id = ?")
+@SQLDelete(sql = "UPDATE posts SET deleted_at = NOW() where id = ?")
 @SQLRestriction("deleted_at IS NULL")
 @Getter
 @Setter
