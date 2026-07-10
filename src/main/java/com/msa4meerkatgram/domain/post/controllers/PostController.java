@@ -27,9 +27,9 @@ public class PostController {
 
     private final PostService postService;
 
-    @Operation(summary = "게시물 목록 조회 처리")
+    @Operation(summary = "게시글 목록 조회 처리")
     @CustomApiResponse(value = {
-        CustomResponseCode.NOT_FOUND_DATA_ERROR
+        CustomResponseCode.INVALID_PARAMETER_ERROR
         , CustomResponseCode.DB_ERROR
         , CustomResponseCode.SYSTEM_ERROR
     })
@@ -41,7 +41,7 @@ public class PostController {
 
     @Operation(summary = "게시글 상세 조회 처리")
     @CustomApiResponse(value = {
-        CustomResponseCode.NOT_FOUND_DATA_ERROR
+        CustomResponseCode.INVALID_PARAMETER_ERROR
         , CustomResponseCode.UNAUTHENTICATED_ERROR
         , CustomResponseCode.INVALID_TOKEN_ERROR
         , CustomResponseCode.DB_ERROR
