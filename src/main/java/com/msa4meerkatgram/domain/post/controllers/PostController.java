@@ -4,10 +4,11 @@ import com.msa4meerkatgram.domain.post.requests.PostIndexRequest;
 import com.msa4meerkatgram.domain.post.responses.PostIndexResponse;
 import com.msa4meerkatgram.domain.post.responses.PostWithUserResponse;
 import com.msa4meerkatgram.domain.post.services.PostService;
-import com.msa4meerkatgram.global.annotations.openapi.ApiNotValidErrorResponse;
+import com.msa4meerkatgram.global.config.openapi.CustomApiResponse;
 import com.msa4meerkatgram.global.responses.BaseResponse;
+import com.msa4meerkatgram.global.responses.constant.CustomResponseCode;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -26,14 +27,26 @@ public class PostController {
 
     private final PostService postService;
 
-    @ApiResponse(responseCode = "200", description = "게시글 목록 조회 성공")
-    @ApiNotValidErrorResponse
+    @Operation(summary = "게시물 목록 조회 처리")
+    @CustomApiResponse(value = {
+        CustomResponseCode.NOT_FOUND_DATA_ERROR
+        , CustomResponseCode.DB_ERROR
+        , CustomResponseCode.SYSTEM_ERROR
+    })
     @GetMapping("/posts")
     public ResponseEntity<BaseResponse<PostIndexResponse>> index(@Valid PostIndexRequest postIndexRequest) {
 
         return ResponseEntity.ok(BaseResponse.success(postService.index(postIndexRequest)));
     }
 
+    @Operation(summary = "게시글 상세 조회 처리")
+    @CustomApiResponse(value = {
+        CustomResponseCode.NOT_FOUND_DATA_ERROR
+        , CustomResponseCode.UNAUTHENTICATED_ERROR
+        , CustomResponseCode.INVALID_TOKEN_ERROR
+        , CustomResponseCode.DB_ERROR
+        , CustomResponseCode.SYSTEM_ERROR
+    })
     @GetMapping("/posts/{id}")
     public ResponseEntity<BaseResponse<PostWithUserResponse>> detail(
             @Parameter(description = "게시글 번호", example = "1")
