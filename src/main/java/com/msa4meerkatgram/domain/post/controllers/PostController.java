@@ -31,13 +31,7 @@ public class PostController {
     @GetMapping("/posts")
     public ResponseEntity<BaseResponse<PostIndexResponse>> index(@Valid PostIndexRequest postIndexRequest) {
 
-        return ResponseEntity.status(200).body(
-                BaseResponse.<PostIndexResponse>builder()
-                        .code("00")
-                        .message("정상 처리")
-                        .data(postService.index(postIndexRequest))
-                        .build()
-        );
+        return ResponseEntity.ok(BaseResponse.success(postService.index(postIndexRequest)));
     }
 
     @GetMapping("/posts/{id}")
@@ -46,12 +40,6 @@ public class PostController {
             @Min(value = 1, message = "1이상 숫자만 가능합니다.")
             @PathVariable Long id
     ) {
-        return ResponseEntity.status(200).body(
-                BaseResponse.<PostWithUserResponse>builder()
-                        .code("00")
-                        .message("정상 처리")
-                        .data(postService.detail(id))
-                        .build()
-        );
+        return ResponseEntity.ok(BaseResponse.success(postService.detail(id)));
     }
 }

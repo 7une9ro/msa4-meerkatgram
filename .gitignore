@@ -47,3 +47,13 @@ storage
 *.md
 *.toml
 *.log
+
+# Shared AI agent instructions
+!AGENTS.md
+!CLAUDE.md
+!.agents/
+!.agents/skills/
+!.agents/skills/**
+!.claude/
+!.claude/skills/
+!.claude/skills/**

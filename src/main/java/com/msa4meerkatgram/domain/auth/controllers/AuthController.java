@@ -41,14 +41,7 @@ public class AuthController {
             @Valid @RequestBody LoginRequest loginRequest
             , HttpServletResponse response
     ) {
-
-        return ResponseEntity.status(200).body(
-                BaseResponse.<AuthResponse>builder()
-                        .code("00")
-                        .message("정상 처리")
-                        .data(authService.login(loginRequest, response))
-                        .build()
-        );
+        return ResponseEntity.ok(BaseResponse.success(authService.login(loginRequest, response)));
     }
 
     @ApiUnauthenticatedErrorResponse
@@ -57,42 +50,24 @@ public class AuthController {
             HttpServletRequest request
             ,HttpServletResponse response
     ) {
-        return ResponseEntity.status(200).body(
-                BaseResponse.<AuthResponse>builder()
-                        .code("00")
-                        .message("토큰 재발급 성공")
-                        .data(authService.reissue(request, response))
-                        .build()
-        );
+        return ResponseEntity.ok(BaseResponse.success(authService.reissue(request, response)));
     }
 
     @ApiUnauthenticatedErrorResponse
     @PostMapping("/logout")
-    public ResponseEntity<BaseResponse<String>> logout(
+    public ResponseEntity<BaseResponse<Void>> logout(
             HttpServletResponse response
             , @AuthenticationPrincipal Claims claims
             ) {
         authService.logout(response, Long.parseLong(claims.getSubject()));
-
-        return ResponseEntity.status(200).body(
-                BaseResponse.<String>builder()
-                        .code("00")
-                        .message("로그아웃 성공")
-                        .build()
-        );
+        return ResponseEntity.ok(BaseResponse.success());
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<BaseResponse<String>> registration(
+    public ResponseEntity<BaseResponse<Void>> registration(
             @Valid @RequestBody RegistrationRequest registrationRequest
             ) {
         authService.registration(registrationRequest);
-
-        return ResponseEntity.status(200).body(
-                BaseResponse.<String>builder()
-                        .code("00")
-                        .message("회원가입 성공")
-                        .build()
-        );
+        return ResponseEntity.ok(BaseResponse.success());
     }
 }

@@ -21,25 +21,13 @@ public class FileController {
     public ResponseEntity<BaseResponse<FileResponse>> storeProfile(
             @ModelAttribute MultipartFile file
     ) {
-        return ResponseEntity.status(200).body(
-                BaseResponse.<FileResponse>builder()
-                        .code("00")
-                        .message("프로필 파일 정상 업로드")
-                        .data(fileService.storeProfile(file))
-                        .build()
-        );
+        return ResponseEntity.ok(BaseResponse.success(fileService.storeProfile(file)));
     }
 
     @PostMapping("/files/posts")
     public ResponseEntity<BaseResponse<FileResponse>> storePost(
             @ModelAttribute MultipartFile file
     ) {
-        return ResponseEntity.status(200).body(
-                BaseResponse.<FileResponse>builder()
-                        .code("00")
-                        .message("게시물 파일 정상 업로드")
-                        .data(fileService.storePost(file))
-                        .build()
-        );
+        return ResponseEntity.ok(BaseResponse.success(fileService.storePost(file)));
     }
 }
