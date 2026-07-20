@@ -45,6 +45,8 @@ README.md
 storage
 
 *.md
+!docs/
+!docs/jpa-learning-lab.md
 *.toml
 *.log
 

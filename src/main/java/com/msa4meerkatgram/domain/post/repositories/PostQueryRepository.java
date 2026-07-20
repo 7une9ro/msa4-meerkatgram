@@ -1,6 +1,5 @@
 package com.msa4meerkatgram.domain.post.repositories;
 
-
 import com.msa4meerkatgram.domain.post.entities.Post;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +16,8 @@ public class PostQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    // select *
-    // from posts
-    //   join users
-    //      on posts.users_id = users.id
-    // where deleted_at is null
-    // order by created_at desc, id;
-    // limit ? offset ?
-    public List<Post> pagination(int offset, int limit) {
+    /** 목록 응답에 작성자를 함께 로딩해 N+1을 방지하는 offset 조회다. */
+    public List<Post> pagination(long offset, int limit) {
         return jpaQueryFactory
                 .selectFrom(post)
                 .join(post.user, user)

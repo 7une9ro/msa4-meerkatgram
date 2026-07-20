@@ -1,6 +1,7 @@
 package com.msa4meerkatgram.domain.post.requests;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
 public record PostIndexRequest(
@@ -10,6 +11,7 @@ public record PostIndexRequest(
 
         @Schema(description = "게시글 제한 수", example = "6", nullable = false, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @Min(value = 1, message = "1이상 숫자만 가능합니다.")
+        @Max(value = 100, message = "100?댁븯 留?媛?ν빀?덈떎.")
         Integer limit
 ) {
     public PostIndexRequest(Integer page, Integer limit) {
