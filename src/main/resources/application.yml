@@ -1,6 +1,8 @@
 spring:
   application:
     name: msa4-meerkatgram
+  config:
+    import: "file:./.env[.properties]"
   jackson:
     serialization:
       write-dates-as-timestamps: false
