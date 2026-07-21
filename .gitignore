@@ -36,7 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 
-/src/main/resources/application.yml
+.env
 
 meerkatgram-doc
 CLAUDE.md
@@ -45,6 +45,17 @@ README.md
 storage
 
 *.md
-build.gradle
+!docs/
+!docs/jpa-learning-lab.md
 *.toml
 *.log
+
+# Shared AI agent instructions
+!AGENTS.md
+!CLAUDE.md
+!.agents/
+!.agents/skills/
+!.agents/skills/**
+!.claude/
+!.claude/skills/
+!.claude/skills/**

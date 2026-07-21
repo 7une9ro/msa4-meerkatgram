@@ -1,5 +1,6 @@
 package com.msa4meerkatgram.global.errors;
 
+import com.msa4meerkatgram.global.responses.constant.CustomResponseCode;
 import com.msa4meerkatgram.global.errors.custom.*;
 import com.msa4meerkatgram.global.responses.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -21,85 +21,56 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // 공통 모듈화
+    private ResponseEntity<BaseResponse<Void>> globalErrorResponse(CustomResponseCode customResponseCode) {
+        return ResponseEntity.status(customResponseCode.getHttpStatus())
+                .body(BaseResponse.<Void>from(customResponseCode));
+    }
+
     @ExceptionHandler(NotRegisteredException.class)
-    public ResponseEntity<BaseResponse<String>> notRegisteredHandle(NotRegisteredException e) {
-        return ResponseEntity.status(401).body(
-                BaseResponse.<String>builder()
-                        .code("E01")
-                        .message("로그인 에러")
-                        .data(e.getMessage())
-                        .build()
-        );
+    public ResponseEntity<BaseResponse<Void>> notRegisteredHandle(NotRegisteredException e) {
+        log.debug(CustomResponseCode.NOT_REGISTERED_ERROR.name(), e);
+        return this.globalErrorResponse(CustomResponseCode.NOT_REGISTERED_ERROR);
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<BaseResponse<String>> authenticationHandle(AuthenticationException e) {
-        return ResponseEntity.status(401).body(
-                BaseResponse.<String>builder()
-                        .code("E02")
-                        .message("UNAUTHENTICATED_ERROR")
-                        .data("로그인 후 이용해 주세요.")
-                        .build()
-        );
+    public ResponseEntity<BaseResponse<Void>> authenticationHandle(AuthenticationException e) {
+        log.debug(CustomResponseCode.UNAUTHENTICATED_ERROR.name(), e);
+        return this.globalErrorResponse(CustomResponseCode.UNAUTHENTICATED_ERROR);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<BaseResponse<String>> accessDeniedHandle(AccessDeniedException e) {
-        return ResponseEntity.status(403).body(
-                BaseResponse.<String>builder()
-                        .code("E03")
-                        .message("UNAUTHORIZED_ERROR")
-                        .data("로그인 후 이용해 주세요.")
-                        .build()
-        );
+    public ResponseEntity<BaseResponse<Void>> accessDeniedHandle(AccessDeniedException e) {
+        log.debug(CustomResponseCode.UNAUTHORIZED_ERROR.name(), e);
+        return this.globalErrorResponse(CustomResponseCode.UNAUTHORIZED_ERROR);
     }
 
     @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<BaseResponse<String>> invalidTokenHandle(InvalidTokenException e) {
-        return ResponseEntity.status(401).body(
-                BaseResponse.<String>builder()
-                        .code("E04")
-                        .message("토큰 에러")
-                        .data(e.getMessage())
-                        .build()
-        );
+    public ResponseEntity<BaseResponse<Void>> invalidTokenHandle(InvalidTokenException e) {
+        log.debug(CustomResponseCode.INVALID_TOKEN_ERROR.name(), e);
+        return this.globalErrorResponse(CustomResponseCode.INVALID_TOKEN_ERROR);
     }
 
     @ExceptionHandler(NotExistPostException.class)
-    public ResponseEntity<BaseResponse<String>> notExistPostHandle(NotExistPostException e) {
-        return ResponseEntity.status(404).body(
-                BaseResponse.<String>builder()
-                        .code("E10")
-                        .message("NOT_EXIST_POST_ERROR")
-                        .data(e.getMessage())
-                        .build()
-        );
+    public ResponseEntity<BaseResponse<Void>> notExistPostHandle(NotExistPostException e) {
+        log.debug(CustomResponseCode.NOT_FOUND_DATA_ERROR.name(), e);
+        return this.globalErrorResponse(CustomResponseCode.NOT_FOUND_DATA_ERROR);
     }
 
     @ExceptionHandler(DuplicatedRecordException.class)
-    public ResponseEntity<BaseResponse<String>> duplicatedRecordHandle(DuplicatedRecordException e) {
-        return ResponseEntity.status(409).body(
-                BaseResponse.<String>builder()
-                        .code("E11")
-                        .message("DUPLICATED_RECORD_ERROR")
-                        .data(e.getMessage())
-                        .build()
-        );
+    public ResponseEntity<BaseResponse<Void>> duplicatedRecordHandle(DuplicatedRecordException e) {
+        log.debug(CustomResponseCode.DUPLICATED_DATA_ERROR.name(), e);
+        return this.globalErrorResponse(CustomResponseCode.DUPLICATED_DATA_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<BaseResponse<String>> methodArgumentTypeMismatchHandle(MethodArgumentTypeMismatchException e) {
-        return ResponseEntity.status(400).body(
-                BaseResponse.<String>builder()
-                        .code("E21")
-                        .message("요청 파라미터에 이상이 있습니다.")
-                        .data(String.format("%s : 필드를 확인해 주세요.", e.getName()))
-                        .build()
-        );
+    public ResponseEntity<BaseResponse<Void>> methodArgumentTypeMismatchHandle(MethodArgumentTypeMismatchException e) {
+        log.debug(CustomResponseCode.INVALID_PARAMETER_ERROR.name(), String.format("%s : 필드를 확인해 주세요.", e.getName()));
+        return this.globalErrorResponse(CustomResponseCode.INVALID_PARAMETER_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<BaseResponse<Map<String, String>>> methodArgumentNotValidHandle(MethodArgumentNotValidException e) {
+    public ResponseEntity<BaseResponse<Void>> methodArgumentNotValidHandle(MethodArgumentNotValidException e) {
         Map<String, String> errors = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -109,51 +80,25 @@ public class GlobalExceptionHandler {
                         (existing, replacement) -> existing // 중복 필드가 있을 경우 기존 값 유지
                 ));
 
-        return ResponseEntity.status(400).body(
-                BaseResponse.<Map<String, String>>builder()
-                        .code("E21")
-                        .message("요청 파라미터에 이상이 있습니다.")
-                        .data(errors)
-                        .build()
-        );
+        log.debug(CustomResponseCode.INVALID_PARAMETER_ERROR.name(), errors);
+        return this.globalErrorResponse(CustomResponseCode.INVALID_PARAMETER_ERROR);
     }
 
     @ExceptionHandler(FileManagedException.class)
-    public ResponseEntity<BaseResponse<String>> fileManagedHandle(FileManagedException e) {
-        log.error("파일 업로드 에러: {}\n{}" , e.getMessage(), Arrays.toString(e.getStackTrace()));
-
-        return ResponseEntity.status(500).body(
-                BaseResponse.<String>builder()
-                        .code("E40")
-                        .message("파일 업로드 실패")
-                        .data(e.getMessage())
-                        .build()
-        );
+    public ResponseEntity<BaseResponse<Void>> fileManagedHandle(FileManagedException e) {
+        log.debug(CustomResponseCode.FILE_MANAGED_ERROR.name(), e);
+        return this.globalErrorResponse(CustomResponseCode.FILE_MANAGED_ERROR);
     }
 
     @ExceptionHandler(SQLException.class)
-    public ResponseEntity<BaseResponse<String>> sqlHandle(SQLException e) {
+    public ResponseEntity<BaseResponse<Void>> sqlHandle(SQLException e) {
         log.error("DB 에러: ", e);
-
-        return ResponseEntity.status(500).body(
-                BaseResponse.<String>builder()
-                        .code("E80")
-                        .message("DB 에러")
-                        .data("현재 서비스 이용이 불가능합니다. 잠시 후 다시 시도해 주십시오.")
-                        .build()
-        );
+        return this.globalErrorResponse(CustomResponseCode.DB_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<BaseResponse<String>> othersHandle(Exception e) {
+    public ResponseEntity<BaseResponse<Void>> othersHandle(Exception e) {
         log.error("시스템 에러: ", e);
-
-        return ResponseEntity.status(500).body(
-                BaseResponse.<String>builder()
-                        .code("E99")
-                        .message("시스템 에러")
-                        .data("현재 서비스 이용이 불가능합니다. 잠시 후 다시 시도해 주십시오.")
-                        .build()
-        );
+        return this.globalErrorResponse(CustomResponseCode.SYSTEM_ERROR);
     }
 }

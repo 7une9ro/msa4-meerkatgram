@@ -1,15 +1,27 @@
 package com.msa4meerkatgram.domain.user.responses;
 
-import lombok.Builder;
+import com.msa4meerkatgram.domain.user.entities.User;
+import com.msa4meerkatgram.global.security.constant.RolePolicy;
 
-@Builder
+import java.time.LocalDateTime;
+
 public record UserResponse(
         Long id,
         String email,
         String nick,
-        String role,
+        RolePolicy role,
         String profile,
-        String createdAt,
-        long countPosts
+        LocalDateTime createdAt
 ) {
+
+    public static UserResponse from(User user) {
+        return new UserResponse(
+                user.getId()
+                , user.getEmail()
+                , user.getNick()
+                , user.getRole()
+                , user.getProfile()
+                , user.getCreatedAt()
+        );
+    }
 }

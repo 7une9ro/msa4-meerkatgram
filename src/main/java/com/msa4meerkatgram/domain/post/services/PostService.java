@@ -1,12 +1,15 @@
 package com.msa4meerkatgram.domain.post.services;
 
 import com.msa4meerkatgram.domain.post.entities.Post;
-import com.msa4meerkatgram.domain.post.mapper.PostMapper;
+import com.msa4meerkatgram.domain.post.repositories.PostQueryRepository;
+import com.msa4meerkatgram.domain.post.repositories.PostRepository;
 import com.msa4meerkatgram.domain.post.requests.PostIndexRequest;
 import com.msa4meerkatgram.domain.post.responses.PostIndexResponse;
+import com.msa4meerkatgram.domain.post.responses.PostWithUserResponse;
 import com.msa4meerkatgram.global.errors.custom.NotExistPostException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,34 +17,29 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final PostMapper postMapper;
+    private final PostRepository postRepository;
+    private final PostQueryRepository postQueryRepository;
 
+    @Transactional(rollbackFor = Exception.class)
     public PostIndexResponse index(PostIndexRequest postIndexRequest) {
 
         int offset = (postIndexRequest.page() - 1) * postIndexRequest.limit();
 
-        // 특정 페이지 게시글 조회
-        List<Post> posts = postMapper.getPagination(postIndexRequest.limit(), offset);
+        List<Post> result = postQueryRepository.pagination(offset, postIndexRequest.limit());
 
-        // 전체 게시글 조회
-        long total = postMapper.getTotalPosts();
+        long total = postRepository.count();
         boolean lastPage = offset + postIndexRequest.limit() >= total;
 
-        // 컨트롤러 전달
-        return PostIndexResponse.builder()
-                .total(total)
-                .lastPage(lastPage)
-                .posts(posts)
-                .build();
+        // total과 lastPage는 직접 계산하지 않고 JPA Page 메타데이터를 사용한다.
+        return PostIndexResponse.from(total, lastPage, result);
     }
 
-    public Post detail(Long id) {
+    @Transactional(rollbackFor = Exception.class)
+    public PostWithUserResponse detail(Long id) {
 
-        Post post = postMapper.findById(id);
+        Post result = postRepository.findById(id)
+                .orElseThrow(() -> new NotExistPostException("존재하지 않는 게시물 입니다."));
 
-        if (post == null)
-            throw new NotExistPostException("존재하지 않는 게시글입니다.");
-
-        return post;
+        return PostWithUserResponse.from(result);
     }
 }

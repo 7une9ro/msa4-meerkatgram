@@ -1,0 +1,100 @@
+spring:
+  application:
+    name: msa4-meerkatgram
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:meerkatgram}?characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+    # 커넥션 풀 설정
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 30000
+  # JPA
+  jpa:
+    hibernate:
+      # 서버를 재시작 할 때, DB 스키마를 어떻게 관리할지 설정
+      # `none` 이외의 설정 값을 사용시, DB 스키마가 초기화 되거나 수정되므로 주의
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+    defer-datasource-initialization: true
+  sql:
+    init:
+      data-locations: classpath*:dummy/*.sql
+      mode: always
+      platform: all
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+  output:
+    ansi:
+      enabled: ALWAYS
+
+# Springdoc Open api 환경 설정
+springdoc:
+  # 클라이언트가 서버로 데이터를 보낼 때의 기본 형식을 지정하는 속성
+  default-consumes-media-type: application/json
+  # 서버가 클라이언트로 데이터를 보낼 때의 기본 형식을 지정하는 속성
+  default-produces-media-type: application/json
+  swagger-ui:
+    # Swagger UI 접속 경로 설정
+    path: /swagger-ui.html
+    # API 정렬 기준
+    operations-sorter: alpha
+  api-docs:
+    # OpenAPI 스펙을 JSON 파일로 확인할 수 있는 경로
+    path: /api-docs
+
+# Security & JWT
+security:
+  jwt:
+    secure: ${JWT_SECURE:false}
+    issuer: ${JWT_ISSUER:meerkat@meerkat.kr}
+    type: JWT
+    access-token-expiry: ${JWT_ACCESS_TOKEN_EXPIRY:1000000}
+    refresh-token-expiry: ${JWT_REFRESH_TOKEN_EXPIRY:1296000000}
+    refresh-token-cookie-name: refresh-token
+    refresh-token-cookie-expiry: ${JWT_REFRESH_TOKEN_COOKIE_EXPIRY:1296000}
+    secret: ${JWT_SECRET:w4e5gwe57nhwb456g3h46g34of6h9439f5h8o7os5789hflsg645eh74s57he54g734}
+    header-key: Authorization
+    scheme: Bearer
+    reiss-uri: /api/reissue-token
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  max-age: 3600
+
+# config (정적 파일 저장 경로 - API 서버 내 storage)
+file:
+  server-uri: ${FILE_SERVER_URI:http://localhost:8080}
+  storage-path: ${FILE_STORAGE_PATH}
+  profile-path: /files/profiles
+  post-path: /files/posts
+  allow-extension-list: [
+    "image/jpeg",
+    "image/jpg",
+    "image/webp",
+    "image/gif",
+    "image/svg",
+    "image/png"
+  ]
+
+server:
+  error:
+    include-stacktrace: always
+    include-message: always
+
+logging:
+  file:
+    name: logs/error.log
+  level:
+    root: info
+    com.msa4meerkatgram.controllers: debug # 패키지명 변경 및 범위 확장
