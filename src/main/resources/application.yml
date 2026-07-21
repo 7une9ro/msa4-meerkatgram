@@ -6,9 +6,9 @@ spring:
       write-dates-as-timestamps: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:meerkatgram}?characterEncoding=UTF-8&serverTimezone=UTC
-    username: ${DB_USER:root}
-    password: ${DB_PASSWORD:root}
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     # 커넥션 풀 설정
     hikari:
       maximum-pool-size: 10
@@ -56,25 +56,25 @@ springdoc:
 # Security & JWT
 security:
   jwt:
-    secure: ${JWT_SECURE:false}
-    issuer: ${JWT_ISSUER:meerkat@meerkat.kr}
+    secure: ${JWT_SECURE}
+    issuer: ${JWT_ISSUER}
     type: JWT
-    access-token-expiry: ${JWT_ACCESS_TOKEN_EXPIRY:1000000}
-    refresh-token-expiry: ${JWT_REFRESH_TOKEN_EXPIRY:1296000000}
+    access-token-expiry: ${JWT_ACCESS_TOKEN_EXPIRY}
+    refresh-token-expiry: ${JWT_REFRESH_TOKEN_EXPIRY}
     refresh-token-cookie-name: refresh-token
-    refresh-token-cookie-expiry: ${JWT_REFRESH_TOKEN_COOKIE_EXPIRY:1296000}
-    secret: ${JWT_SECRET:w4e5gwe57nhwb456g3h46g34of6h9439f5h8o7os5789hflsg645eh74s57he54g734}
+    refresh-token-cookie-expiry: ${JWT_REFRESH_TOKEN_COOKIE_EXPIRY}
+    secret: ${JWT_SECRET}
     header-key: Authorization
     scheme: Bearer
-    reiss-uri: /api/reissue-token
+    reissue-uri: /api/reissue-token
 
 cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}
   max-age: 3600
 
 # config (정적 파일 저장 경로 - API 서버 내 storage)
 file:
-  server-uri: ${FILE_SERVER_URI:http://localhost:8080}
+  server-uri: ${FILE_SERVER_URI}
   storage-path: ${FILE_STORAGE_PATH}
   profile-path: /files/profiles
   post-path: /files/posts
